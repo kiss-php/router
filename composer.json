@@ -1,0 +1,18 @@
+{
+    "name": "agrandesr/router",
+    "description": "This is a KISS router and I try to keep it simple.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Agrandesr\\Http\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "A.Grandes.R",
+            "email": "agrandesr@gmail.com"
+        }
+    ],
+    "require": {}
+}
