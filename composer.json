@@ -1,11 +1,11 @@
 {
-    "name": "agrandesr/router",
+    "name": "kiss-php/router",
     "description": "This is a KISS router and I try to keep it simple.",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Agrandesr\\Http\\": "src/"
+            "Kiss\\Http\\": "src/"
         }
     },
     "authors": [
