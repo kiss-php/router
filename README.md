@@ -13,7 +13,7 @@ To start to use add the routes in your index.php file.
 ``` php
 require 'vendor/autoload.php';
 
-use Agrandesr\Http\Router;
+use Kiss\Http\Router;
 
 Router::use('', 'Agrandesr\EasyRouter\Controllers\User'); //Function default main
 Router::use('get','Agrandesr\EasyRouter\Controllers\User::get');
