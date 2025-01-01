@@ -1,5 +1,5 @@
 <?php
-namespace Agrandesr\Http;
+namespace Kiss\Http;
 
 use Error;
 use Exception;
