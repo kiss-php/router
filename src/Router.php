@@ -24,7 +24,7 @@ class TrueRouter {
 
     public function use(string $path, string $execute) : bool {
         //If is served the user or dont check we return false
-        if($this->served ||!$this->checkPath($path)) return false;
+        if($this->served || !$this->checkPath($path)) return false;
         //We mark as served an execute the string
         $this->served=true;
         return $this->executeString($execute);
@@ -53,6 +53,14 @@ class TrueRouter {
 
     private function checkPath($path, &$options=[]) : bool {       
         $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+        // Fix: Detect and remove the subdirectory base path automatically
+        $basePath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+        if ($basePath !== '/' && $basePath !== '.') {
+            if (strpos($currentPath, $basePath) === 0) {
+                $currentPath = substr($currentPath, strlen($basePath));
+            }
+        }
 
         $path=trim($path,'/ ');
         $checkingPathArray=explode('/',strtolower($path));
