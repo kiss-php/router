@@ -43,6 +43,7 @@ class TrueRouter {
     }
 
     private function executeString(string $execute) : bool {
+        // If no method is provided, call main by default.
         $parts = explode('::', $execute, 2);
         $class = $parts[0];
         $method = $parts[1]??'main';
@@ -62,6 +63,7 @@ class TrueRouter {
     }
 
     private function executeFile(string $file) : bool {
+        // Execute files from the front controller directory only.
         $basePath = realpath(dirname($_SERVER['SCRIPT_FILENAME']));
         if ($basePath === false) return false;
 
@@ -72,9 +74,11 @@ class TrueRouter {
         if (!$isAbsolutePath) $file = '/' . $file;
         if (strpos($file, '/') === 0 || strpos($file, '\\') === 0) $file = $basePath . $file;
 
+        // Resolve the final path before requiring it, so ../ cannot escape.
         $realFile = realpath($file);
         if ($realFile === false || !is_file($realFile)) return false;
 
+        // Only allow files inside the front controller directory.
         $basePath = rtrim($basePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         if (strpos($realFile, $basePath) !== 0) return false;
 
@@ -88,6 +92,7 @@ class TrueRouter {
         // Fix: Detect and remove the subdirectory base path automatically
         $basePath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
         if ($basePath !== '/' && $basePath !== '.') {
+            // Match only the exact base path or a child path.
             if ($currentPath === $basePath || strpos($currentPath, $basePath . '/') === 0) {
                 $currentPath = substr($currentPath, strlen($basePath));
             }
@@ -103,6 +108,7 @@ class TrueRouter {
 
         $currentPath=trim($currentPath,'/ ');
         $actualPathArray=explode('/',$currentPath);
+        // Compare routes case-insensitively, but keep original values for options.
         $actualPathCompareArray=explode('/',strtolower($currentPath));
         
         if(Count($actualPathArray)!==Count($checkingPathArray)) return false;
