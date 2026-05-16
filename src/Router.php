@@ -139,30 +139,6 @@ class TrueRouter {
     }
 
     private function getMimeType(string $file) : string {
-        $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-        $mimeTypes = [
-            'css' => 'text/css; charset=UTF-8',
-            'js' => 'application/javascript; charset=UTF-8',
-            'mjs' => 'application/javascript; charset=UTF-8',
-            'json' => 'application/json; charset=UTF-8',
-            'txt' => 'text/plain; charset=UTF-8',
-            'html' => 'text/html; charset=UTF-8',
-            'htm' => 'text/html; charset=UTF-8',
-            'png' => 'image/png',
-            'jpg' => 'image/jpeg',
-            'jpeg' => 'image/jpeg',
-            'gif' => 'image/gif',
-            'svg' => 'image/svg+xml',
-            'webp' => 'image/webp',
-            'ico' => 'image/x-icon',
-            'woff' => 'font/woff',
-            'woff2' => 'font/woff2',
-            'ttf' => 'font/ttf',
-            'otf' => 'font/otf',
-        ];
-
-        if (isset($mimeTypes[$extension])) return $mimeTypes[$extension];
-
         if (function_exists('mime_content_type')) {
             $mimeType = mime_content_type($file);
             if ($mimeType !== false) return $mimeType;
