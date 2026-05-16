@@ -18,6 +18,14 @@ RewriteCond %{REQUEST_URI} !^/index\.php$
 RewriteRule ^ index.php [L,QSA]
 ```
 
+If you use Nginx, add this inside your `server` block.
+
+``` nginx
+location / {
+    rewrite ^ /index.php last;
+}
+```
+
 To start to use add the routes in your index.php file.
 ``` php
 require 'vendor/autoload.php';
