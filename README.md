@@ -9,6 +9,23 @@ To install you execute:
 composer install ...
 ```
 
+If you use Apache, create a `.htaccess` file next to your `index.php` file.
+
+``` apache
+RewriteEngine On
+
+RewriteCond %{REQUEST_URI} !^/index\.php$
+RewriteRule ^ index.php [L,QSA]
+```
+
+If you use Nginx, add this inside your `server` block.
+
+``` nginx
+location / {
+    rewrite ^ /index.php last;
+}
+```
+
 To start to use add the routes in your index.php file.
 ``` php
 require 'vendor/autoload.php';
@@ -19,6 +36,14 @@ Router::use('', 'Agrandesr\EasyRouter\Controllers\User'); //Function default mai
 Router::use('get','Agrandesr\EasyRouter\Controllers\User::get');
 Router::use('update','Agrandesr\EasyRouter\Controllers\User::update');
 ```
+
+If you want to serve files from a folder, use `useFolder`.
+
+``` php
+Router::useFolder('img', 'public/images/');
+```
+
+This serves `img/logo.png` from `public/images/logo.png`, and `img/128x128/logo.png` from `public/images/128x128/logo.png`.
 
 If you prefer to execute a PHP file directly, use `execute`.
 

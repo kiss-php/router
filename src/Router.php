@@ -37,6 +37,18 @@ class TrueRouter {
         $this->served=true;
         return $this->executeFile($file);
     }
+
+    public function useFolder(string $path, string $folder) : bool {
+        if($this->served) return false;
+
+        $file = $this->getFolderFile($path);
+        if($file === false) return false;
+
+        if(!$this->serveFolderFile($folder, $file)) return false;
+
+        $this->served=true;
+        return true;
+    }
     
     public function getOption(string $key) {
         return $this->pathOptions[$key]??null;
@@ -86,7 +98,55 @@ class TrueRouter {
         return true;
     }
 
-    private function checkPath($path, &$options=[]) : bool {       
+    private function getFolderFile(string $path) {
+        $path = trim($path, '/ ');
+        $currentPath = trim($this->getCurrentPath(), '/ ');
+
+        if ($path === '') return false;
+
+        $pathLower = strtolower($path);
+        $currentPathLower = strtolower($currentPath);
+
+        if (strpos($currentPathLower, $pathLower . '/') !== 0) return false;
+
+        return substr($currentPath, strlen($path) + 1);
+    }
+
+    private function serveFolderFile(string $folder, string $file) : bool {
+        // Serve files only from the configured folder.
+        $basePath = realpath(dirname($_SERVER['SCRIPT_FILENAME']));
+        if ($basePath === false) return false;
+
+        $folder = trim($folder, '/\\ ');
+        $realFolder = realpath($basePath . DIRECTORY_SEPARATOR . $folder);
+        if ($realFolder === false || !is_dir($realFolder)) return false;
+
+        // Resolve the requested file before reading it, so ../ cannot escape.
+        $realFile = realpath($realFolder . DIRECTORY_SEPARATOR . $file);
+        if ($realFile === false || !is_file($realFile)) return false;
+
+        $realFolder = rtrim($realFolder, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        if (strpos($realFile, $realFolder) !== 0) return false;
+
+        if (!headers_sent()) {
+            header('Content-Type: ' . $this->getMimeType($realFile));
+            header('Content-Length: ' . filesize($realFile));
+        }
+
+        readfile($realFile);
+        return true;
+    }
+
+    private function getMimeType(string $file) : string {
+        if (function_exists('mime_content_type')) {
+            $mimeType = mime_content_type($file);
+            if ($mimeType !== false) return $mimeType;
+        }
+
+        return 'application/octet-stream';
+    }
+
+    private function getCurrentPath() : string {
         $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
         // Fix: Detect and remove the subdirectory base path automatically
@@ -102,6 +162,12 @@ class TrueRouter {
         if ($currentPath === '/index.php' || stripos($currentPath, '/index.php/') === 0) {
             $currentPath = substr($currentPath, 10);
         }
+
+        return $currentPath;
+    }
+
+    private function checkPath($path, &$options=[]) : bool {       
+        $currentPath = $this->getCurrentPath();
 
         $path=trim($path,'/ ');
         $checkingPathArray=explode('/',strtolower($path));
