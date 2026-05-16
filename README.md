@@ -20,6 +20,12 @@ Router::use('get','Agrandesr\EasyRouter\Controllers\User::get');
 Router::use('update','Agrandesr\EasyRouter\Controllers\User::update');
 ```
 
+If you prefer to execute a PHP file directly, use `execute`.
+
+``` php
+Router::execute('about', '/pages/about.php');
+```
+
 If you want to create relative path you can use brackets.
 
 ``` php
