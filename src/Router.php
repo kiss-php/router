@@ -81,6 +81,11 @@ class TrueRouter {
             }
         }
 
+        // Also strip index.php if it's at the start of the path
+        if (stripos($currentPath, '/index.php') === 0) {
+            $currentPath = substr($currentPath, 10);
+        }
+
         $path=trim($path,'/ ');
         $checkingPathArray=explode('/',strtolower($path));
 
