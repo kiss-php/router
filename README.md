@@ -9,6 +9,19 @@ To install you execute:
 composer install ...
 ```
 
+If you use Apache, create a `.htaccess` file next to your `index.php` file.
+
+``` apache
+RewriteEngine On
+
+# Ensure we don't redirect existing files or directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Redirect everything else to index.php
+RewriteRule ^(.*)$ index.php [L,QSA]
+```
+
 To start to use add the routes in your index.php file.
 ``` php
 require 'vendor/autoload.php';
