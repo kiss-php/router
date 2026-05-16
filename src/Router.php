@@ -103,7 +103,7 @@ class TrueRouter {
         $path = trim($path, '/ ');
         $currentPath = trim($this->getCurrentPath(), '/ ');
 
-        if ($path === '') return $currentPath !== '' ? $currentPath : false;
+        if ($path === '') return false;
 
         $pathLower = strtolower($path);
         $currentPathLower = strtolower($currentPath);

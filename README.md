@@ -69,16 +69,6 @@ Router::useFolder('img', 'public/images/');
 
 This serves `img/logo.png` from `public/images/logo.png`, and `img/128x128/logo.png` from `public/images/128x128/logo.png`.
 
-When you use `php -S` for local development, you can serve `public/` from the URL root.
-
-``` php
-if (in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1'])) {
-    Router::useFolder('/', 'public/');
-}
-```
-
-This serves `styles.css` from `public/styles.css`.
-
 If you prefer to execute a PHP file directly, use `execute`.
 
 ``` php
