@@ -43,7 +43,9 @@ class TrueRouter {
     }
 
     private function executeString(string $execute) : bool {
-        list($class, $method) = explode('::', $execute);
+        $parts = explode('::', $execute, 2);
+        $class = $parts[0];
+        $method = $parts[1]??'main';
 
         if(!$method) $method='main';
 
@@ -60,13 +62,23 @@ class TrueRouter {
     }
 
     private function executeFile(string $file) : bool {
-        if (strpos($file, '/') === 0 || strpos($file, '\\') === 0) {
-            $file = dirname($_SERVER['SCRIPT_FILENAME']) . $file;
-        }
+        $basePath = realpath(dirname($_SERVER['SCRIPT_FILENAME']));
+        if ($basePath === false) return false;
 
-        if (!is_file($file)) return false;
+        $isAbsolutePath = strpos($file, '/') === 0
+            || strpos($file, '\\') === 0
+            || preg_match('/^[A-Z]:[\\\\\/]/i', $file);
 
-        require $file;
+        if (!$isAbsolutePath) $file = '/' . $file;
+        if (strpos($file, '/') === 0 || strpos($file, '\\') === 0) $file = $basePath . $file;
+
+        $realFile = realpath($file);
+        if ($realFile === false || !is_file($realFile)) return false;
+
+        $basePath = rtrim($basePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        if (strpos($realFile, $basePath) !== 0) return false;
+
+        require $realFile;
         return true;
     }
 
@@ -76,13 +88,13 @@ class TrueRouter {
         // Fix: Detect and remove the subdirectory base path automatically
         $basePath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
         if ($basePath !== '/' && $basePath !== '.') {
-            if (strpos($currentPath, $basePath) === 0) {
+            if ($currentPath === $basePath || strpos($currentPath, $basePath . '/') === 0) {
                 $currentPath = substr($currentPath, strlen($basePath));
             }
         }
 
         // Also strip index.php if it's at the start of the path
-        if (stripos($currentPath, '/index.php') === 0) {
+        if ($currentPath === '/index.php' || stripos($currentPath, '/index.php/') === 0) {
             $currentPath = substr($currentPath, 10);
         }
 
@@ -90,7 +102,8 @@ class TrueRouter {
         $checkingPathArray=explode('/',strtolower($path));
 
         $currentPath=trim($currentPath,'/ ');
-        $actualPathArray=explode('/',strtolower($currentPath));
+        $actualPathArray=explode('/',$currentPath);
+        $actualPathCompareArray=explode('/',strtolower($currentPath));
         
         if(Count($actualPathArray)!==Count($checkingPathArray)) return false;
 
@@ -104,7 +117,7 @@ class TrueRouter {
             }
 
             //If not match we can return false to dont lose more time
-            if ($pathPart !== $actualPathArray[$keyNum]) return false;
+            if ($pathPart !== $actualPathCompareArray[$keyNum]) return false;
         }
         return true;
     }
