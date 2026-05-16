@@ -17,6 +17,7 @@ class TrueRouter {
     private array $routes;
     private array $pathOptions=[];
     private bool $served=false;
+    private ?string $currentPath=null;
 
     public function notFound(string $execute) {
         $this->executeString($execute);
@@ -102,7 +103,7 @@ class TrueRouter {
         $path = trim($path, '/ ');
         $currentPath = trim($this->getCurrentPath(), '/ ');
 
-        if ($path === '') return false;
+        if ($path === '') return $currentPath !== '' ? $currentPath : false;
 
         $pathLower = strtolower($path);
         $currentPathLower = strtolower($currentPath);
@@ -147,7 +148,9 @@ class TrueRouter {
     }
 
     private function getCurrentPath() : string {
-        $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        if ($this->currentPath !== null) return $this->currentPath;
+
+        $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)??'';
 
         // Fix: Detect and remove the subdirectory base path automatically
         $basePath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
@@ -163,7 +166,8 @@ class TrueRouter {
             $currentPath = substr($currentPath, 10);
         }
 
-        return $currentPath;
+        $this->currentPath = $currentPath;
+        return $this->currentPath;
     }
 
     private function checkPath($path, &$options=[]) : bool {       
