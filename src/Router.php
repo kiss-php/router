@@ -29,6 +29,14 @@ class TrueRouter {
         $this->served=true;
         return $this->executeString($execute);
     }
+
+    public function execute(string $path, string $file) : bool {
+        //If is served the user or dont check we return false
+        if($this->served || !$this->checkPath($path)) return false;
+        //We mark as served an execute the file
+        $this->served=true;
+        return $this->executeFile($file);
+    }
     
     public function getOption(string $key) {
         return $this->pathOptions[$key]??null;
@@ -49,6 +57,17 @@ class TrueRouter {
         } 
 
         return false;
+    }
+
+    private function executeFile(string $file) : bool {
+        if (strpos($file, '/') === 0 || strpos($file, '\\') === 0) {
+            $file = dirname($_SERVER['SCRIPT_FILENAME']) . $file;
+        }
+
+        if (!is_file($file)) return false;
+
+        require $file;
+        return true;
     }
 
     private function checkPath($path, &$options=[]) : bool {       
